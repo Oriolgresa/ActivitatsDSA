@@ -18,8 +18,8 @@ public class StackImpl <E> implements Stack <E>{
         this.elements[count++]=e;
     }
     public E pop() throws PilaBuida{
-        if ( count <= lem) throw new PilaBuida();
-        return elements[count--];
+        if ( count == 0) throw new PilaBuida();
+        return elements[--count];
 
     }
     public int size(){
