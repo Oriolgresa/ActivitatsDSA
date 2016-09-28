@@ -4,7 +4,7 @@ package edu.upd.eetac.dsa;
  * Hello world!
  *
  */
-public class App 
+public class MainThread
 {
     public static void main( String[] args )
     {

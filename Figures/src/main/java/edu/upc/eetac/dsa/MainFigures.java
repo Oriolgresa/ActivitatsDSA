@@ -3,7 +3,7 @@ package edu.upc.eetac.dsa;
 import java.util.Arrays;
 import java.util.Comparator;
 
-public class App
+public class MainFigures
 {
     public static void main( String[] args )
     {

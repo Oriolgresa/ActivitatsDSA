@@ -4,7 +4,7 @@ package edu.upc.eetac.dsa;
  * Hello world!
  *
  */
-public class App
+public class MainStack
 {
     public static void main( String[] args )
     {

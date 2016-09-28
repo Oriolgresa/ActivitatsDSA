@@ -1,13 +1,13 @@
-package edu.upd.eetac.dsa;
+package edu.upc.eetac.dsa;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 
 /**
- * Unit test for simple App.
+ * Unit test for simple MainFigures.
  */
-public class AppTest 
+public class MainFiguresTest
     extends TestCase
 {
     /**
@@ -15,7 +15,7 @@ public class AppTest
      *
      * @param testName name of the test case
      */
-    public AppTest( String testName )
+    public MainFiguresTest(String testName )
     {
         super( testName );
     }
@@ -25,7 +25,7 @@ public class AppTest
      */
     public static Test suite()
     {
-        return new TestSuite( AppTest.class );
+        return new TestSuite( MainFiguresTest.class );
     }
 
     /**
