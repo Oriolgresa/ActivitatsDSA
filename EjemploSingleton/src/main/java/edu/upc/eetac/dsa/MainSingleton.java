@@ -4,7 +4,6 @@ public class MainSingleton
 {
     public static void main( String[] args ) throws IllegalAccessException, InstantiationException, ClassNotFoundException
     {
-
         try {
             Factory.getInstance().getCommand("C1").execute();
             Factory.getInstance().getCommand("C2").execute();
@@ -13,7 +12,6 @@ public class MainSingleton
             Factory.getInstance().getCommand("C4").execute();
         } catch (Exception e) {
             e.printStackTrace();
-            System.out.println(e.getMessage());
         }
 
 
