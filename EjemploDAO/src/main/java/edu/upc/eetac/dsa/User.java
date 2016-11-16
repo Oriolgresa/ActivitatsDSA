@@ -3,11 +3,11 @@ package edu.upc.eetac.dsa;
 /**
  * Created by OriolGresa on 10/10/16.
  */
-public class UserDao extends DAO{
+public class User extends DAO{
     public int id;
     public String name, address;
 
-    public UserDao(int id, String name, String address) {
+    public User(int id, String name, String address) {
         super();
         this.id = id;
         this.name = name;

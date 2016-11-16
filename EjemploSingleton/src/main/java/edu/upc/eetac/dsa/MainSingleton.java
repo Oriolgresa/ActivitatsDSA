@@ -2,7 +2,7 @@ package edu.upc.eetac.dsa;
 
 public class MainSingleton
 {
-    public static void main( String[] args )
+    public static void main( String[] args ) throws IllegalAccessException, InstantiationException, ClassNotFoundException
     {
 
         try {
@@ -10,6 +10,7 @@ public class MainSingleton
             Factory.getInstance().getCommand("C2").execute();
             Factory.getInstance().getCommand("C3").execute();
             Factory.getInstance().getCommand("C1").execute();
+            Factory.getInstance().getCommand("C4").execute();
         } catch (Exception e) {
             e.printStackTrace();
             System.out.println(e.getMessage());

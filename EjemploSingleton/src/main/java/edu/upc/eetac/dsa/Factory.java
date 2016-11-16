@@ -15,7 +15,7 @@ public class Factory {
         if(instance==null) instance = new Factory();
         return instance;
     }
-    public Command getCommand (String cmd) throws Exception{
+    public Command getCommand (String cmd) throws ClassNotFoundException, IllegalAccessException, InstantiationException{
         Command c = cache.get(cmd);
         if(c==null){
             Class cl = Class.forName("edu.upc.eetac.dsa."+cmd);
