@@ -3,10 +3,9 @@ package edu.upc.eetac.dsa;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
+import java.sql.*;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Properties;
 
 /**
@@ -43,7 +42,6 @@ public abstract class DAO {
         try {
             Method m = this.getClass().getMethod(getUpper(f.getName()), null);
             res = m.invoke(this, null).toString();
-
         }
         catch (NoSuchMethodException e1) {
             e1.printStackTrace();
@@ -63,7 +61,6 @@ public abstract class DAO {
 
         for (Field f : fields) {
             String res = getValors(f);
-            System.out.println(i + "," + f.getName() + ": " + res);
             preparedStatement.setObject(i, res);
             i++;
         }
@@ -77,14 +74,12 @@ public abstract class DAO {
     public void insert() throws NoSuchMethodException, IllegalAccessException, InvocationTargetException {
         StringBuffer sb = new StringBuffer();
         sb.append("INSERT INTO ").append(this.getClass().getSimpleName());
-        System.out.println(sb.toString());
 
         Field [] fields = this.getClass().getFields();
 
         sb.append(" (");
         int i=0;
         for(Field f : fields){
-            System.out.println(f.getName());
             sb.append(f.getName());
             i++;
             if(i!=fields.length)
@@ -99,27 +94,10 @@ public abstract class DAO {
             if(i!=fields.length)
             sb.append(",");
         }
-        System.out.println();
 
-        i=1;
-        for(Field f : fields){
-                try {
-                    Method m = this.getClass().getMethod(getUpper(f.getName()), null);
-                    String res = m.invoke(this, null).toString();
-                    System.out.println("setObject("+i+","+f.getName()+": "+res+")");
-
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                }
-            i++;
-        }
         sb.append(");");
 
-        System.out.println("QUERY: "+sb.toString());
+        System.out.println("QUERY: "+sb.toString()+"\n");
 
        Connection con = getConnection();
         try{
@@ -130,25 +108,110 @@ public abstract class DAO {
         catch (SQLException e) {
             e.printStackTrace();
         }
-        catch (NullPointerException e){
-            e.printStackTrace();
-            System.out.println("holaaaaaaaaaaaa      "+e);
-        }
-
     }
 
     public void select(int pk){
         StringBuffer sb = new StringBuffer();
-        sb.append("QUERY: SELECT * FROM ").append(this.getClass().getSimpleName()).append(" WHERE ID = ").append(pk);
-        System.out.println();
-        System.out.println(sb.toString());
+        sb.append("SELECT * FROM ").append(this.getClass().getSimpleName()).append(" WHERE ID = ").append(pk);
+        System.out.println("QUERY: "+sb.toString());
+
+        Connection con = getConnection();
+
+        try {
+
+            Statement stmt= con.createStatement();
+            ResultSet rs= stmt.executeQuery(sb.toString());
+            ResultSetMetaData rsmd=rs.getMetaData();
+            rs.next();
+            for(int i=1; i<rsmd.getColumnCount()+1;i++){ //lo ejecuto el numero de veces de columnas que tenga en la tabla
+                try {
+                    if (rsmd.getColumnTypeName(i).equals("INT")) {//para la columna i,si es del tipo int
+                        System.out.println(rsmd.getColumnLabel(i) + " = " + rs.getInt(i)); //obtengo la etiqueta de la columna y el entero (id=1...)
+                    }
+                    if (rsmd.getColumnTypeName(i).equals("VARCHAR")) { //si es del tipovarchar, obtengo lo que es tambien
+                        System.out.println(rsmd.getColumnLabel(i) + " = " + rs.getString(i));
+                    }
+                    if (i == rsmd.getColumnCount()) { //cuando i=numero de columnas, voy al siguiente y salgo del bucle,reiniciando i
+                        rs.next();
+                        i = 0;
+                    }
+                }
+                catch(Exception e){
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
     }
 
-    public void update(){
+    public void update(int pk) {
+        StringBuffer sb = new StringBuffer();
+        sb.append("UPDATE ").append(this.getClass().getSimpleName()).append(" SET ");
+
+        Field[] fields = this.getClass().getDeclaredFields(); //campos--> obtener campos declarados en esta clase:name, address, id
+
+        int numfields = 0;
+        for (Field f : fields) {
+            if (numfields == fields.length - 1) {
+                sb.append(f.getName() + "=?");
+            } else {
+                sb.append(f.getName() + "=?,");
+            }
+            numfields++;
+        }
+
+        sb.append(" WHERE id=" + pk);
+
+        System.out.println("QUERY: " + sb.toString());
+
+        Connection con = getConnection();
+        try {
+            PreparedStatement preparedStatement = con.prepareStatement(sb.toString());
+            insertarElementos(preparedStatement);
+            preparedStatement.execute();
+
+        } catch (NoSuchMethodException e) {
+            e.printStackTrace();
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+        } catch (InvocationTargetException e) {
+            e.printStackTrace();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void delete(int pk){
+        StringBuffer sb = new StringBuffer();
+        sb.append("DELETE FROM ").append(this.getClass().getSimpleName()).append(" WHERE ID="+pk);
+        System.out.println("QUERY: "+sb.toString());
+        Connection con = getConnection();
+
+        try {
+            Statement stmt=con.createStatement();
+            stmt.execute(sb.toString());
+        }
+        catch (SQLException e) {
+            e.printStackTrace();
+        }
 
     }
 
-    public void delete(){
-
+    public List<User> getAllUsers() throws SQLException {
+        Connection con = getConnection();
+        Statement stmt= null;
+        try {
+            stmt = con.createStatement();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        ResultSet rs= stmt.executeQuery("SELECT * FROM User");
+        List<User> lista = new ArrayList<User>();
+        while (rs.next()){
+            User user = new User(rs.getInt("id"),rs.getString("name"),rs.getString("address"));
+            lista.add(user);
+            System.out.println(user);
+        }
+        return lista;
     }
 }
