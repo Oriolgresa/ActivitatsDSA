@@ -2,7 +2,6 @@ package edu.upc.eetac.dsa;
 
 import java.util.HashMap;
 import org.apache.log4j.Logger;
-import org.apache.log4j.BasicConfigurator;
 
 /**
  * Created by OriolGresa on 3/10/16.

@@ -13,7 +13,7 @@ import java.util.Properties;
  */
 public abstract class DAO {
 
-    public Connection getConnection() {
+    public static Connection getConnection() {
         Connection con=null;
         try
         {
@@ -29,7 +29,7 @@ public abstract class DAO {
             info.setProperty("useSSL", "false");
             info.setProperty("serverTimezone", "UTC");
             con = DriverManager.getConnection(url, info);
-            System.out.println("Conexion creada.");
+            System.out.println("Conexion creada.\n");
         }
         catch (Exception e)
         {e.printStackTrace();}
@@ -110,9 +110,9 @@ public abstract class DAO {
         }
     }
 
-    public void select(int pk){
+    public void select(int id){
         StringBuffer sb = new StringBuffer();
-        sb.append("SELECT * FROM ").append(this.getClass().getSimpleName()).append(" WHERE ID = ").append(pk);
+        sb.append("SELECT * FROM ").append(this.getClass().getSimpleName()).append(" WHERE ID = ").append(id);
         System.out.println("QUERY: "+sb.toString());
 
         Connection con = getConnection();
@@ -144,7 +144,7 @@ public abstract class DAO {
         }
     }
 
-    public void update(int pk) {
+    public void update() {
         StringBuffer sb = new StringBuffer();
         sb.append("UPDATE ").append(this.getClass().getSimpleName()).append(" SET ");
 
@@ -160,7 +160,8 @@ public abstract class DAO {
             numfields++;
         }
 
-        sb.append(" WHERE id=" + pk);
+        int id=Integer.parseInt(getValors(fields[0]));
+        sb.append(" WHERE id=" + id);
 
         System.out.println("QUERY: " + sb.toString());
 
@@ -181,9 +182,11 @@ public abstract class DAO {
         }
     }
 
-    public void delete(int pk){
+    public void delete(){
         StringBuffer sb = new StringBuffer();
-        sb.append("DELETE FROM ").append(this.getClass().getSimpleName()).append(" WHERE ID="+pk);
+        Field[] fields = this.getClass().getDeclaredFields();
+        int p=Integer.parseInt(getValors(fields[0]));
+        sb.append("DELETE FROM ").append(this.getClass().getSimpleName()).append(" WHERE ID="+p);
         System.out.println("QUERY: "+sb.toString());
         Connection con = getConnection();
 
@@ -197,7 +200,7 @@ public abstract class DAO {
 
     }
 
-    public List<User> getAllUsers() throws SQLException {
+    public static List<User> getAllUsers() throws SQLException {
         Connection con = getConnection();
         Statement stmt= null;
         try {
@@ -210,8 +213,46 @@ public abstract class DAO {
         while (rs.next()){
             User user = new User(rs.getInt("id"),rs.getString("name"),rs.getString("address"));
             lista.add(user);
-            System.out.println(user);
+        }
+        //System.out.println(lista);
+        for (User u: lista) {
+            System.out.println(u+"\n");
         }
         return lista;
     }
+
+    /*public void select2(String name, String address){
+        StringBuffer sb = new StringBuffer();
+        sb.append("SELECT * FROM ").append(this.getClass().getSimpleName()).append(" WHERE NAME =  '");
+        sb.append(name).append("' AND ADDRESS = '").append(address).append("'");
+        System.out.println("QUERY: "+sb.toString());
+
+        Connection con = getConnection();
+
+        try {
+
+            Statement stmt= con.createStatement();
+            ResultSet rs= stmt.executeQuery(sb.toString());
+            ResultSetMetaData rsmd=rs.getMetaData();
+            rs.next();
+            for(int i=1; i<rsmd.getColumnCount()+1;i++){ //lo ejecuto el numero de veces de columnas que tenga en la tabla
+                try {
+                    if (rsmd.getColumnTypeName(i).equals("INT")) {//para la columna i,si es del tipo int
+                        System.out.println(rsmd.getColumnLabel(i) + " = " + rs.getInt(i)); //obtengo la etiqueta de la columna y el entero (id=1...)
+                    }
+                    if (rsmd.getColumnTypeName(i).equals("VARCHAR")) { //si es del tipovarchar, obtengo lo que es tambien
+                        System.out.println(rsmd.getColumnLabel(i) + " = " + rs.getString(i));
+                    }
+                    if (i == rsmd.getColumnCount()) { //cuando i=numero de columnas, voy al siguiente y salgo del bucle,reiniciando i
+                        rs.next();
+                        i = 0;
+                    }
+                }
+                catch(Exception e){
+                }
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }*/
 }
